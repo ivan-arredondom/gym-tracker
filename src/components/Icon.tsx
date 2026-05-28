@@ -3,7 +3,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
   X, Check, Plus, Minus, Flag, FileText, Timer,
   Search, ArrowUp, ArrowRight, Repeat, Bell, Link,
-  MoreHorizontal, Download, Upload, Play, GripVertical,
+  MoreHorizontal, Download, Upload, Play, GripVertical, Trash2,
 } from 'lucide-react';
 
 const ICON_MAP = {
@@ -34,6 +34,7 @@ const ICON_MAP = {
   upload: Upload,
   play: Play,
   drag: GripVertical,
+  trash: Trash2,
 } as const;
 
 export type IconName = keyof typeof ICON_MAP;

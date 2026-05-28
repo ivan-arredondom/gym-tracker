@@ -25,6 +25,7 @@ interface ExerciseCardProps {
   restEnabled: boolean;
   restDuration: number;
   onRestStart: () => void;
+  onRemoveBlock: () => void;
 }
 
 function ExerciseCard({
@@ -39,6 +40,7 @@ function ExerciseCard({
   supersetLabel,
   restEnabled,
   onRestStart,
+  onRemoveBlock,
 }: ExerciseCardProps) {
   const { exercises } = useStore();
   const meta = exercises[block.exId];
@@ -343,25 +345,6 @@ function ExerciseCard({
           <Icon name="arrowUp" size={16} color={block.flag === 'increase' ? 'var(--accent)' : 'var(--text-mute)'} />
         </button>
 
-        {/* change flag */}
-        <button
-          onClick={() => toggleFlag('change')}
-          style={{
-            width: 36,
-            height: 34,
-            borderRadius: 10,
-            background: block.flag === 'change' ? 'rgba(255,180,0,0.12)' : 'transparent',
-            border: `1px solid ${block.flag === 'change' ? 'var(--warn)' : 'var(--border)'}`,
-            color: block.flag === 'change' ? 'var(--warn)' : 'var(--text-mute)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-          }}
-        >
-          <Icon name="swap" size={16} color={block.flag === 'change' ? 'var(--warn)' : 'var(--text-mute)'} />
-        </button>
-
         {/* note */}
         <button
           onClick={() => setShowNote(true)}
@@ -379,6 +362,24 @@ function ExerciseCard({
           }}
         >
           <Icon name="note" size={16} color={block.note ? 'var(--text)' : 'var(--text-mute)'} />
+        </button>
+
+        {/* remove exercise */}
+        <button
+          onClick={onRemoveBlock}
+          style={{
+            width: 36,
+            height: 34,
+            borderRadius: 10,
+            background: 'transparent',
+            border: '1px solid var(--border)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <Icon name="trash" size={16} color="var(--danger)" />
         </button>
       </div>
 
@@ -566,6 +567,13 @@ export function WorkoutScreen() {
     setLiveSession(s => ({
       ...s,
       exercises: s.exercises.map((b, i) => (i === idx ? { ...b, ...patch } : b)),
+    }));
+  };
+
+  const removeBlock = (idx: number) => {
+    setLiveSession(s => ({
+      ...s,
+      exercises: s.exercises.filter((_, i) => i !== idx),
     }));
   };
 
@@ -766,6 +774,7 @@ export function WorkoutScreen() {
                         restEnabled={prefs.restTimerEnabled}
                         restDuration={prefs.restTimerDuration}
                         onRestStart={() => setShowRest(true)}
+                        onRemoveBlock={() => removeBlock(idx)}
                       />
                     ))}
                   </div>
@@ -788,6 +797,7 @@ export function WorkoutScreen() {
                 restEnabled={prefs.restTimerEnabled}
                 restDuration={prefs.restTimerDuration}
                 onRestStart={() => setShowRest(true)}
+                onRemoveBlock={() => removeBlock(idx)}
               />
             );
           })}
