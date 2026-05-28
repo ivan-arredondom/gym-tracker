@@ -4,6 +4,7 @@ import { Btn, IconBtn } from '../components/Btn';
 import { Sheet } from '../components/Sheet';
 import { useStore } from '../store/useStore';
 import { STANDALONE_DAYS } from '../data/program';
+import { uid } from '../utils';
 
 function DayEditor({ dayId, onClose }: { dayId: string; onClose: () => void }) {
   const { days, exercises } = useStore();
@@ -288,9 +289,31 @@ function RoutineEditor({ routineId, onBack }: { routineId: string; onBack: () =>
 }
 
 export function RoutinesScreen() {
-  const { routines, days, prefs, setPrefs } = useStore();
+  const { routines, days, prefs, setPrefs, saveRoutine } = useStore();
   const [editingRoutine, setEditingRoutine] = useState<string | null>(null);
   const [editingStandaloneDay, setEditingStandaloneDay] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newSubtitle, setNewSubtitle] = useState('');
+  const [nameError, setNameError] = useState('');
+
+  const handleCreate = async () => {
+    if (!newName.trim()) { setNameError('Name is required.'); return; }
+    const id = uid();
+    await saveRoutine({ id, name: newName.trim(), subtitle: newSubtitle.trim() || undefined, days: [] });
+    setCreating(false);
+    setNewName('');
+    setNewSubtitle('');
+    setNameError('');
+    setEditingRoutine(id);
+  };
+
+  const openCreate = () => {
+    setNewName('');
+    setNewSubtitle('');
+    setNameError('');
+    setCreating(true);
+  };
 
   if (editingRoutine) {
     return (
@@ -331,7 +354,7 @@ export function RoutinesScreen() {
             Routines
           </div>
         </div>
-        <IconBtn name="plus" ring color="var(--text)" />
+        <IconBtn name="plus" ring color="var(--text)" onClick={openCreate} />
       </div>
 
       <div style={{ padding: '20px 16px 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -470,6 +493,98 @@ export function RoutinesScreen() {
           </div>
         </div>
       )}
+
+      {/* Create routine sheet */}
+      <Sheet open={creating} onClose={() => setCreating(false)} maxHeight={380}>
+        <div style={{ padding: '4px 20px 0', display: 'flex', flexDirection: 'column', gap: 0 }}>
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 10.5,
+            color: 'var(--text-dim)',
+            letterSpacing: 1.2,
+            textTransform: 'uppercase',
+            marginBottom: 16,
+          }}>
+            New routine
+          </div>
+
+          <div style={{ marginBottom: 14 }}>
+            <div style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 10.5,
+              color: 'var(--text-dim)',
+              letterSpacing: 1.2,
+              textTransform: 'uppercase',
+              marginBottom: 8,
+            }}>
+              Name
+            </div>
+            <input
+              value={newName}
+              onChange={e => { setNewName(e.target.value); setNameError(''); }}
+              onKeyDown={e => e.key === 'Enter' && handleCreate()}
+              placeholder="e.g. Push / Pull / Legs"
+              autoFocus
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                height: 46,
+                background: 'var(--card)',
+                border: `1px solid ${nameError ? 'var(--danger)' : 'var(--border)'}`,
+                borderRadius: 12,
+                padding: '0 14px',
+                color: 'var(--text)',
+                fontFamily: 'var(--font-ui)',
+                fontSize: 15,
+              }}
+            />
+            {nameError && (
+              <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--danger)', marginTop: 4 }}>
+                {nameError}
+              </div>
+            )}
+          </div>
+
+          <div style={{ marginBottom: 20 }}>
+            <div style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 10.5,
+              color: 'var(--text-dim)',
+              letterSpacing: 1.2,
+              textTransform: 'uppercase',
+              marginBottom: 8,
+            }}>
+              Subtitle{' '}
+              <span style={{ color: 'var(--text-dim)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>
+                (optional)
+              </span>
+            </div>
+            <input
+              value={newSubtitle}
+              onChange={e => setNewSubtitle(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleCreate()}
+              placeholder="e.g. Upper body focus"
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                height: 46,
+                background: 'var(--card)',
+                border: '1px solid var(--border)',
+                borderRadius: 12,
+                padding: '0 14px',
+                color: 'var(--text)',
+                fontFamily: 'var(--font-ui)',
+                fontSize: 15,
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Btn kind="secondary" onClick={() => setCreating(false)} style={{ flex: 1 }}>Cancel</Btn>
+            <Btn onClick={handleCreate} style={{ flex: 2 }}>Create &amp; edit</Btn>
+          </div>
+        </div>
+      </Sheet>
 
       <Sheet open={!!editingStandaloneDay} onClose={() => setEditingStandaloneDay(null)} maxHeight={580}>
         {editingStandaloneDay && (
