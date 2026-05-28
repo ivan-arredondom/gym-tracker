@@ -3,7 +3,6 @@ import { Icon } from '../components/Icon';
 import { Btn, IconBtn } from '../components/Btn';
 import { Sheet } from '../components/Sheet';
 import { useStore } from '../store/useStore';
-import { STANDALONE_DAYS } from '../data/program';
 import { uid } from '../utils';
 
 function DayEditor({ dayId, onClose }: { dayId: string; onClose: () => void }) {
