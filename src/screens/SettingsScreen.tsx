@@ -1,7 +1,8 @@
-import { type ReactNode, useRef } from 'react';
+import { type ReactNode, useRef, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { useStore } from '../store/useStore';
-import { exportBackup, importBackup } from '../db/backup';
+import { exportJSON, exportCSV, exportXLSX, importBackup } from '../db/backup';
+import { Sheet } from '../components/Sheet';
 
 function SettingsGroup({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
@@ -116,6 +117,12 @@ function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void 
 export function SettingsScreen() {
   const { prefs, setPrefs } = useStore();
   const importRef = useRef<HTMLInputElement>(null);
+  const [exportSheetOpen, setExportSheetOpen] = useState(false);
+
+  const handleExport = async (fn: () => Promise<void>) => {
+    setExportSheetOpen(false);
+    await fn();
+  };
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -270,7 +277,7 @@ export function SettingsScreen() {
         <SettingsRow
           label="Export data"
           right={<Icon name="download" size={16} color="var(--text-mute)" />}
-          onClick={exportBackup}
+          onClick={() => setExportSheetOpen(true)}
         />
         <SettingsRow
           label="Import data"
@@ -306,6 +313,44 @@ export function SettingsScreen() {
       }}>
         Gym Tracker · built for one
       </div>
+
+      <Sheet open={exportSheetOpen} onClose={() => setExportSheetOpen(false)} maxHeight={320}>
+        <div style={{ padding: '8px 16px 0' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10.5, color: 'var(--text-dim)', letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 12 }}>
+            Export format
+          </div>
+          {[
+            { label: 'JSON', detail: 'Full backup — re-importable', fn: exportJSON },
+            { label: 'CSV', detail: 'Flat workout log — opens in any spreadsheet', fn: exportCSV },
+            { label: 'Excel / Sheets', detail: '.xlsx with Workout Log + Exercise Bank tabs', fn: exportXLSX },
+          ].map(({ label, detail, fn }) => (
+            <button
+              key={label}
+              onClick={() => handleExport(fn)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '14px 4px',
+                borderBottom: '1px solid var(--border)',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: '1px solid var(--border)',
+                cursor: 'pointer',
+                textAlign: 'left',
+                WebkitTapHighlightColor: 'transparent',
+              } as React.CSSProperties}
+            >
+              <div>
+                <div style={{ fontFamily: 'var(--font-ui)', fontSize: 15, color: 'var(--text)' }}>{label}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-dim)', marginTop: 2, letterSpacing: 0.4 }}>{detail}</div>
+              </div>
+              <Icon name="download" size={16} color="var(--text-mute)" />
+            </button>
+          ))}
+        </div>
+      </Sheet>
     </div>
   );
 }

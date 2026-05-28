@@ -268,10 +268,8 @@ function ExerciseCard({
             done={s.done}
             onWeightTap={() => onWeightTap(i)}
             onRepsTap={() => onRepsTap(i)}
-            onToggleDone={() => {
-              handleSetToggle(i);
-              handleRemoveSet; // keep ref alive
-            }}
+            onToggleDone={() => handleSetToggle(i)}
+            onRemove={block.sets.length > 1 ? () => handleRemoveSet(i) : undefined}
             isPR={isPR(i)}
           />
         );

@@ -12,6 +12,7 @@ interface SetRowProps {
   onWeightTap: () => void;
   onRepsTap: () => void;
   onToggleDone: () => void;
+  onRemove?: () => void;
   isPR?: boolean;
 }
 
@@ -26,6 +27,7 @@ export function SetRow({
   onWeightTap,
   onRepsTap,
   onToggleDone,
+  onRemove,
   isPR,
 }: SetRowProps) {
   const h = 52;
@@ -85,20 +87,50 @@ export function SetRow({
       borderTop: '1px solid var(--border)',
       transition: 'background var(--dur-set) ease',
     }}>
-      {/* index */}
-      <div style={{
-        width: 38,
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: 'var(--font-mono)',
-        fontSize: 11,
-        color: isWarm ? 'var(--warn)' : 'var(--text-dim)',
-        letterSpacing: 0.4,
-      }}>
-        {idx}
-      </div>
+      {/* index — tap to remove if removable */}
+      {onRemove ? (
+        <button
+          onClick={onRemove}
+          style={{
+            width: 38,
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            WebkitTapHighlightColor: 'transparent',
+            flexShrink: 0,
+          }}
+        >
+          <div style={{
+            width: 18,
+            height: 18,
+            borderRadius: 9,
+            background: 'var(--danger)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <Icon name="minus" size={10} color="white" strokeWidth={2.5} />
+          </div>
+        </button>
+      ) : (
+        <div style={{
+          width: 38,
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'var(--font-mono)',
+          fontSize: 11,
+          color: isWarm ? 'var(--warn)' : 'var(--text-dim)',
+          letterSpacing: 0.4,
+        }}>
+          {idx}
+        </div>
+      )}
 
       <Cell val={weight} ghost={lastWeight} onTap={onWeightTap} highlight={isPR} />
 
