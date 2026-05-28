@@ -67,6 +67,11 @@ export async function putExercise(ex: Exercise): Promise<void> {
   await db.put('exercises', ex);
 }
 
+export async function deleteExercise(id: string): Promise<void> {
+  const db = await getDB();
+  await db.delete('exercises', id);
+}
+
 // ── Days ───────────────────────────────────────────────────────────
 export async function getAllDays(): Promise<Record<string, Day>> {
   const db = await getDB();

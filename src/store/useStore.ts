@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { Exercise, Day, Routine, Session, Prefs, ExerciseBlock, SetEntry, DayItem } from '../types';
 import {
   getAllExercises, getAllDays, getAllRoutines, getAllSessions, getPrefs,
-  putExercise, putDay, putRoutine, putSession, putPrefs, deleteSession,
+  putExercise, deleteExercise, putDay, putRoutine, putSession, putPrefs, deleteSession,
 } from '../db/idb';
 import { DAYS as SEED_DAYS } from '../data/program';
 
@@ -45,6 +45,7 @@ interface AppState {
 
   // ── actions: exercises / days / routines ────────────────────────
   saveExercise: (ex: Exercise) => Promise<void>;
+  removeExercise: (id: string) => Promise<void>;
   saveDay: (day: Day) => Promise<void>;
   saveRoutine: (routine: Routine) => Promise<void>;
 }
@@ -221,6 +222,13 @@ export const useStore = create<AppState>((set, get) => ({
   saveExercise: async ex => {
     await putExercise(ex);
     set({ exercises: { ...get().exercises, [ex.id]: ex } });
+  },
+
+  removeExercise: async id => {
+    await deleteExercise(id);
+    const exercises = { ...get().exercises };
+    delete exercises[id];
+    set({ exercises });
   },
 
   saveDay: async day => {
