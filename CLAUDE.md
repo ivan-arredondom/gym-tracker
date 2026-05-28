@@ -25,7 +25,7 @@ src/
   store/useStore.ts    # Zustand store — all state + actions
   db/idb.ts            # IndexedDB helpers (get/put/delete per store)
   db/seed.ts           # seedIfNeeded() — runs once on first launch
-  db/backup.ts         # exportBackup / importBackup (JSON file)
+  db/backup.ts         # exportJSON / exportCSV / exportXLSX / importBackup
   data/program.ts      # Real seed data: EXERCISES, DAYS, ROUTINES, STANDALONE_DAYS
 
   components/
@@ -35,7 +35,7 @@ src/
     Sheet.tsx          # Bottom sheet (translateY animation)
     NumberPad.tsx      # Custom keypad for weight/reps (never iOS keyboard)
     RestTimer.tsx      # Countdown ring pill
-    SetRow.tsx         # Single set row (index / weight / × / reps / check)
+    SetRow.tsx         # Single set row (index / weight / × / reps / check); index cell becomes red minus button when removable
     FlagBanner.tsx     # "You flagged this to increase/change last time"
 
   screens/
@@ -83,21 +83,21 @@ Standalone days = any `Day` in IndexedDB **not** referenced by any routine's `da
 
 - Full workout flow: start → log sets (with NumberPad) → finish → summary → history
 - Superset grouping with accent left rail
-- Flag system (increase / change) with `flagFromLast` banner next session
+- Flag system (increase only — "change" flag removed from UI) with `flagFromLast` banner next session
 - PR detection (`bestSetFor` compares volume)
 - Rest timer (optional, configurable duration)
 - HomeScreen: dropdown routine picker — browsing doesn't change `prefs.activeRoutineId`; "All days" view; "Next up" tracks active routine only
 - History: week-grouped, stat tiles (streak, volume, sessions this week)
 - Bank: tap any exercise for detail sheet; add/edit/delete custom exercises
 - Routines: create routine (+ button) → RoutineEditor; create/edit standalone days
-- Settings: unit toggle, rest timer, haptics, export/import JSON, clear all
+- Settings: unit toggle, rest timer, haptics, export (JSON / CSV / Excel .xlsx), import JSON, clear all
 - GitHub Actions → Pages deploy on push to `main`
 
 ## What's NOT Done Yet
 
 - **DayEditor** is read-only — "Add exercise" button and remove/reorder exercises in a day are stubs
 - **RoutineEditor** "Add day", Rename, Duplicate, Delete routine buttons are stubs
-- **Workout**: "Add exercise" mid-session opens a sheet but isn't fully wired
+- **Workout**: "Add exercise" mid-session opens a sheet but isn't fully wired; remove exercise (trash button) and remove set (red minus on index) are working
 - **Editable SessionDetail** (currently read-only)
 - Drag-reorder of exercises within a day or workout
 - First-launch onboarding ("Pick your routine")
