@@ -3,6 +3,7 @@ import { Icon } from '../components/Icon';
 import { Btn, IconBtn } from '../components/Btn';
 import { Sheet } from '../components/Sheet';
 import { useStore } from '../store/useStore';
+import { STANDALONE_DAYS } from '../data/program';
 
 function DayEditor({ dayId, onClose }: { dayId: string; onClose: () => void }) {
   const { days, exercises } = useStore();
@@ -289,6 +290,7 @@ function RoutineEditor({ routineId, onBack }: { routineId: string; onBack: () =>
 export function RoutinesScreen() {
   const { routines, days, prefs, setPrefs } = useStore();
   const [editingRoutine, setEditingRoutine] = useState<string | null>(null);
+  const [editingStandaloneDay, setEditingStandaloneDay] = useState<string | null>(null);
 
   if (editingRoutine) {
     return (
@@ -411,6 +413,69 @@ export function RoutinesScreen() {
           );
         })}
       </div>
+
+      {/* Standalone days */}
+      {STANDALONE_DAYS.some(id => days[id]) && (
+        <div style={{ padding: '28px 16px 0' }}>
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 10.5,
+            color: 'var(--text-dim)',
+            letterSpacing: 1.2,
+            textTransform: 'uppercase',
+            marginBottom: 10,
+            paddingLeft: 4,
+          }}>
+            Standalone days
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {STANDALONE_DAYS.map(dayId => {
+              const d = days[dayId];
+              if (!d) return null;
+              const exCount = d.items.flatMap(it => typeof it === 'string' ? [it] : it.superset).length;
+              return (
+                <div key={dayId} style={{
+                  background: 'var(--card)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 12,
+                  padding: '12px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 18,
+                      fontWeight: 500,
+                      color: 'var(--text)',
+                      letterSpacing: -0.2,
+                    }}>
+                      {d.name}
+                    </div>
+                    <div style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 10.5,
+                      color: 'var(--text-dim)',
+                      letterSpacing: 0.8,
+                      marginTop: 2,
+                    }}>
+                      {exCount} exercises
+                    </div>
+                  </div>
+                  <IconBtn name="chevR" onClick={() => setEditingStandaloneDay(dayId)} color="var(--text-mute)" />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <Sheet open={!!editingStandaloneDay} onClose={() => setEditingStandaloneDay(null)} maxHeight={580}>
+        {editingStandaloneDay && (
+          <DayEditor dayId={editingStandaloneDay} onClose={() => setEditingStandaloneDay(null)} />
+        )}
+      </Sheet>
     </div>
   );
 }
