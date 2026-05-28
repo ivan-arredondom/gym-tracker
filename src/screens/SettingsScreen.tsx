@@ -333,7 +333,6 @@ export function SettingsScreen() {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '14px 4px',
-                borderBottom: '1px solid var(--border)',
                 background: 'transparent',
                 border: 'none',
                 borderBottom: '1px solid var(--border)',
