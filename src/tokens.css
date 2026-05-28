@@ -1,0 +1,45 @@
+:root {
+  /* ── colors ─────────────────────────────────────── */
+  --bg:          #0a0a0b;
+  --bg-raised:   #101012;
+  --card:        #141416;
+  --card2:       #1a1a1d;
+  --border:      rgba(255, 255, 255, 0.06);
+  --border-md:   rgba(255, 255, 255, 0.10);
+  --border-hi:   rgba(255, 255, 255, 0.18);
+  --text:        #f5f5f6;
+  --text-mute:   rgba(245, 245, 246, 0.58);
+  --text-dim:    rgba(245, 245, 246, 0.34);
+  --text-ghost:  rgba(245, 245, 246, 0.18);
+  --accent:      oklch(0.74 0.13 245);
+  --accent-dim:  oklch(0.74 0.13 245 / 0.18);
+  --accent-ink:  oklch(0.18 0.04 245);
+  --done:        oklch(0.78 0.15 150);
+  --done-dim:    oklch(0.78 0.15 150 / 0.16);
+  --warn:        oklch(0.78 0.15 75);
+  --danger:      oklch(0.66 0.20 25);
+
+  /* ── typography ─────────────────────────────────── */
+  --font-display: 'Archivo Narrow', 'Archivo', system-ui, sans-serif;
+  --font-ui:      Inter, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* ── spacing / radii ─────────────────────────────── */
+  --r-chip:   9px;
+  --r-btn:    12px;
+  --r-card:   16px;
+  --r-sheet:  20px;
+  --r-pill:   9999px;
+
+  /* ── safe areas (iOS) ────────────────────────────── */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+
+  /* ── motion ──────────────────────────────────────── */
+  --ease-sheet:   cubic-bezier(0.22, 0.85, 0.32, 1);
+  --dur-sheet:    240ms;
+  --dur-set:      160ms;
+  --dur-toggle:   160ms;
+}

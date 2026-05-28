@@ -1,0 +1,60 @@
+@import './tokens.css';
+
+/* Archivo Narrow — numbers / display */
+@import '@fontsource/archivo-narrow/400.css';
+@import '@fontsource/archivo-narrow/500.css';
+@import '@fontsource/archivo-narrow/700.css';
+
+/* Inter — UI text */
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+
+/* JetBrains Mono — kickers / metadata */
+@import '@fontsource/jetbrains-mono/400.css';
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+}
+
+/* Hide scrollbars globally — content scrolls, bars don't show */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { width: 0; height: 0; }
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+input, textarea {
+  font: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input:focus, textarea:focus { outline: none; }
+
+::selection { background: rgba(255, 255, 255, 0.18); }
