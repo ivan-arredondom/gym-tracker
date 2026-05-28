@@ -289,13 +289,18 @@ function RoutineEditor({ routineId, onBack }: { routineId: string; onBack: () =>
 }
 
 export function RoutinesScreen() {
-  const { routines, days, prefs, setPrefs, saveRoutine } = useStore();
+  const { routines, days, prefs, setPrefs, saveRoutine, saveDay } = useStore();
   const [editingRoutine, setEditingRoutine] = useState<string | null>(null);
   const [editingStandaloneDay, setEditingStandaloneDay] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [creatingStandalone, setCreatingStandalone] = useState(false);
   const [newName, setNewName] = useState('');
   const [newSubtitle, setNewSubtitle] = useState('');
   const [nameError, setNameError] = useState('');
+
+  // Derived: any day not referenced by any routine
+  const routineDayIds = new Set(Object.values(routines).flatMap(r => r.days));
+  const standaloneDayIds = Object.keys(days).filter(id => !routineDayIds.has(id));
 
   const handleCreate = async () => {
     if (!newName.trim()) { setNameError('Name is required.'); return; }
@@ -308,11 +313,27 @@ export function RoutinesScreen() {
     setEditingRoutine(id);
   };
 
+  const handleCreateStandalone = async () => {
+    if (!newName.trim()) { setNameError('Name is required.'); return; }
+    const id = uid();
+    await saveDay({ id, name: newName.trim(), items: [] });
+    setCreatingStandalone(false);
+    setNewName('');
+    setNameError('');
+    setEditingStandaloneDay(id);
+  };
+
   const openCreate = () => {
     setNewName('');
     setNewSubtitle('');
     setNameError('');
     setCreating(true);
+  };
+
+  const openCreateStandalone = () => {
+    setNewName('');
+    setNameError('');
+    setCreatingStandalone(true);
   };
 
   if (editingRoutine) {
@@ -438,61 +459,81 @@ export function RoutinesScreen() {
       </div>
 
       {/* Standalone days */}
-      {STANDALONE_DAYS.some(id => days[id]) && (
-        <div style={{ padding: '28px 16px 0' }}>
-          <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: 10.5,
-            color: 'var(--text-dim)',
-            letterSpacing: 1.2,
-            textTransform: 'uppercase',
-            marginBottom: 10,
-            paddingLeft: 4,
-          }}>
-            Standalone days
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {STANDALONE_DAYS.map(dayId => {
-              const d = days[dayId];
-              if (!d) return null;
-              const exCount = d.items.flatMap(it => typeof it === 'string' ? [it] : it.superset).length;
-              return (
-                <div key={dayId} style={{
-                  background: 'var(--card)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 12,
-                  padding: '12px 12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: 18,
-                      fontWeight: 500,
-                      color: 'var(--text)',
-                      letterSpacing: -0.2,
-                    }}>
-                      {d.name}
-                    </div>
-                    <div style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: 10.5,
-                      color: 'var(--text-dim)',
-                      letterSpacing: 0.8,
-                      marginTop: 2,
-                    }}>
-                      {exCount} exercises
-                    </div>
-                  </div>
-                  <IconBtn name="chevR" onClick={() => setEditingStandaloneDay(dayId)} color="var(--text-mute)" />
-                </div>
-              );
-            })}
-          </div>
+      <div style={{ padding: '28px 16px 0' }}>
+        <div style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: 10.5,
+          color: 'var(--text-dim)',
+          letterSpacing: 1.2,
+          textTransform: 'uppercase',
+          marginBottom: 10,
+          paddingLeft: 4,
+        }}>
+          Standalone days
         </div>
-      )}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {standaloneDayIds.map(dayId => {
+            const d = days[dayId];
+            if (!d) return null;
+            const exCount = d.items.flatMap(it => typeof it === 'string' ? [it] : it.superset).length;
+            return (
+              <div key={dayId} style={{
+                background: 'var(--card)',
+                border: '1px solid var(--border)',
+                borderRadius: 12,
+                padding: '12px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+              }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: 18,
+                    fontWeight: 500,
+                    color: 'var(--text)',
+                    letterSpacing: -0.2,
+                  }}>
+                    {d.name}
+                  </div>
+                  <div style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 10.5,
+                    color: 'var(--text-dim)',
+                    letterSpacing: 0.8,
+                    marginTop: 2,
+                  }}>
+                    {exCount} exercises
+                  </div>
+                </div>
+                <IconBtn name="chevR" onClick={() => setEditingStandaloneDay(dayId)} color="var(--text-mute)" />
+              </div>
+            );
+          })}
+
+          <button
+            onClick={openCreateStandalone}
+            style={{
+              height: 48,
+              borderRadius: 12,
+              background: 'transparent',
+              border: '1px dashed var(--border-md)',
+              color: 'var(--text-mute)',
+              fontFamily: 'var(--font-ui)',
+              fontSize: 13,
+              fontWeight: 500,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              cursor: 'pointer',
+            }}
+          >
+            <Icon name="plus" size={14} color="var(--text-mute)" />
+            New standalone day
+          </button>
+        </div>
+      </div>
 
       {/* Create routine sheet */}
       <Sheet open={creating} onClose={() => setCreating(false)} maxHeight={380}>
@@ -590,6 +631,64 @@ export function RoutinesScreen() {
         {editingStandaloneDay && (
           <DayEditor dayId={editingStandaloneDay} onClose={() => setEditingStandaloneDay(null)} />
         )}
+      </Sheet>
+
+      {/* Create standalone day sheet */}
+      <Sheet open={creatingStandalone} onClose={() => setCreatingStandalone(false)} maxHeight={280}>
+        <div style={{ padding: '4px 20px 0', display: 'flex', flexDirection: 'column', gap: 0 }}>
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 10.5,
+            color: 'var(--text-dim)',
+            letterSpacing: 1.2,
+            textTransform: 'uppercase',
+            marginBottom: 16,
+          }}>
+            New standalone day
+          </div>
+
+          <div style={{ marginBottom: 20 }}>
+            <div style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 10.5,
+              color: 'var(--text-dim)',
+              letterSpacing: 1.2,
+              textTransform: 'uppercase',
+              marginBottom: 8,
+            }}>
+              Name
+            </div>
+            <input
+              value={newName}
+              onChange={e => { setNewName(e.target.value); setNameError(''); }}
+              onKeyDown={e => e.key === 'Enter' && handleCreateStandalone()}
+              placeholder="e.g. Full Upper Body"
+              autoFocus
+              style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                height: 46,
+                background: 'var(--card)',
+                border: `1px solid ${nameError ? 'var(--danger)' : 'var(--border)'}`,
+                borderRadius: 12,
+                padding: '0 14px',
+                color: 'var(--text)',
+                fontFamily: 'var(--font-ui)',
+                fontSize: 15,
+              }}
+            />
+            {nameError && (
+              <div style={{ fontFamily: 'var(--font-ui)', fontSize: 12, color: 'var(--danger)', marginTop: 4 }}>
+                {nameError}
+              </div>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Btn kind="secondary" onClick={() => setCreatingStandalone(false)} style={{ flex: 1 }}>Cancel</Btn>
+            <Btn onClick={handleCreateStandalone} style={{ flex: 2 }}>Create &amp; edit</Btn>
+          </div>
+        </div>
       </Sheet>
     </div>
   );

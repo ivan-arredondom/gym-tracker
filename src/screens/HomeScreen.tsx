@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { Icon } from '../components/Icon';
 import { useStore } from '../store/useStore';
 import { fmtDate } from '../utils';
-import { STANDALONE_DAYS } from '../data/program';
 import type { Day, Session } from '../types';
 
 // ── DayCard ─────────────────────────────────────────────────────────
@@ -344,9 +343,8 @@ export function HomeScreen() {
 
   // Build day list to show based on view selection
   const routineEntries = Object.entries(routines);
-  const standaloneDayIds = STANDALONE_DAYS.filter(id =>
-    !routineEntries.some(([, r]) => r.days.includes(id))
-  );
+  const routineDayIds = new Set(routineEntries.flatMap(([, r]) => r.days));
+  const standaloneDayIds = Object.keys(days).filter(id => !routineDayIds.has(id));
 
   return (
     <div style={{ height: '100%', overflow: 'auto', paddingBottom: 100, background: 'var(--bg)' }}>
